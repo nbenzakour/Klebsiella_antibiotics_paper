@@ -2,11 +2,13 @@
 title: "KP_population_EDA"
 author: "Nouri L. BEN ZAKOUR"
 date: "12 July 2018"
-output: md_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.path = "images/KP_")
+knitr::opts_chunk$set(fig.path = "../images/KP_")
 ```
 
 
@@ -25,7 +27,6 @@ library(gridExtra)
 
 ### Loading data
 
-setwd("~/REPOS/Klebsiella_antibiotics_paper/scripts")
 bap <- read.csv2("../data/KP_screening_data.csv", header = TRUE, sep = ",", na.strings = "", stringsAsFactors = FALSE)
 
 ### Summary
