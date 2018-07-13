@@ -59,7 +59,7 @@
 
     ### Loading data
 
-    #setwd("~//R_repository_data/scripts")
+    setwd("~/REPOS/Klebsiella_antibiotics_paper/scripts")
     bap <- read.csv2("../data/KP_screening_data.csv", header = TRUE, sep = ",", na.strings = "", stringsAsFactors = FALSE)
 
     ### Summary

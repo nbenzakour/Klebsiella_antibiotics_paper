@@ -1,0 +1,225 @@
+---
+title: "KP_associations_EDA"
+author: "Nouri L. BEN ZAKOUR"
+date: "12 July 2018"
+output: md_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.path = "images/KPassoc_")
+```
+
+
+```{r}
+# Libraries
+#install.packages("heatmaply")
+#install.packages("tidyverse")
+
+### Setting up environment and loading data
+
+library(dplyr)
+library(knitr)
+library(vcd)
+library(grid)
+
+### Loading data
+
+#setwd("~/REPOS/Klebsiella_antibiotics_paper/scripts")
+bap <- read.csv2("KP_screening_data.csv", header = TRUE, sep = ",", na.strings = "", stringsAsFactors = FALSE)
+
+### Summary
+#summary(bap)
+```
+
+
+
+Association analyses
+--------------------
+
+Extended mosaic plot displays show the standardized residuals of a loglinear model of the counts from by the color and outline of the mosaic's tiles. 
+Standardized residuals are often referred to a standard normal distribution.
+Negative residuals are drawn in shaded of red and with broken outlines; positive ones are drawn in blue with solid outlines.
+
+```{r}
+bap$ompK36 = as.character(bap$ompK36)
+bap$ompK35 = as.character(bap$ompK35)
+bap$ST = as.character(bap$ST)
+porines <- select(bap,Id,ST,Insertion,ompK36,ompK35,Year,Source,Source_edited,Source_summarised,Host,Country)
+```
+
+**Mosaic plot of the ompK35 presence/absence versus ST**
+
+
+```{r, fig.height=7, fig.width=23}
+porines$ST = as.character(porines$ST)
+
+porines$Insertion <- as.factor(porines$Insertion)
+levels <- levels(porines$Insertion)
+levels[length(levels) + 1] <- "-"
+porines$Insertion <- factor(porines$Insertion, levels = levels)
+porines$Insertion[is.na(porines$Insertion)] <- "-"
+porines$Insertion = as.character(porines$Insertion)
+
+## contingency table
+mytableompK35 <- xtabs(~ST+ompK35, data=porines)
+
+## mosaic plot
+mosaicplot(mytableompK35, shade = TRUE, las=2)
+
+# ftable creates flat contingency tables
+summary(mytableompK35)
+
+## mosaic plot with expected freq
+#expected35 <- mosaic(~ST+ompK35, data=porine_data, type = "expected")
+#expected35
+
+```
+
+**Mosaic plots of the ompK36 presence/absence versus ST**
+
+
+```{r, fig.height=7, fig.width=23}
+
+mytableompK36 <- xtabs(~ST+ompK36, data=porines)  # 2-Way Frequency Table 
+mosaicplot(mytableompK36, shade = TRUE, las=2)
+summary(mytableompK36)  # chi-square test of indepedence
+
+#expected36 <- mosaic(~ST+ompK36, data=porine_data, type = "expected")
+#expected36
+
+```
+
+
+**Mosaic plot of the ompK35/ompK36 presence/absence versus ST (3-way contigency table)**
+
+
+```{r, fig.height=7, fig.width=50}
+# 3-way contingency table
+mytableompK3536 <- xtabs(~ST+ompK35+ompK36, data=porines)
+mosaicplot(mytableompK3536, shade = TRUE, las=2)
+summary(mytableompK3536)
+```
+
+**Mosaic plot of the ompK35 presence/absence and Insertion in ompK36 versus ST**
+
+
+```{r, fig.height=7, fig.width=50}
+
+mytableinsert <- xtabs(~ST+Insertion+ompK35, data=porines)  # 2-Way Frequency Table 
+mosaicplot(mytableinsert, shade = TRUE, las=2)
+summary(mytableinsert)  # chi-square test of independence
+
+```
+
+**Mosaic plot of the Insertion + presence/absence of ompK36 versus ST and ompK35**
+
+
+```{r, fig.height=7, fig.width=50}
+
+# combine insertion and ompK36 presence/absence in one factor
+porine_data2 <- data.frame(porines[,1:5], ompK36_ins=paste(porines[,4],porines[,3],sep="-"))
+mytableinsert2 <- xtabs(~ST+ompK36_ins+ompK35, data=porine_data2)  # 2-Way Frequency Table 
+mosaicplot(mytableinsert2, shade = TRUE, las=2)
+summary(mytableinsert2)  # chi-square test of independence
+
+```
+
+**Supplemental figure S8 - Mosaic plot of the Insertion + presence/absence of ompK36 versus ST and ompK35 (significant only)**
+
+
+```{r, fig.height=9, fig.width=40}
+
+# filter significantly different STs based on previous plot
+significant <- c('-', '101', '11', '14', '147', '278', '280', '15', '16', '17', '120', '200', '231', '258', '127', '273', '277', '29', '278', '3', '336', '37', '392', '442', '512', '873')
+porine_data2_significant <- filter(porine_data2, ST %in% significant) %>% na.omit()
+mytableinsert3 <- xtabs(~ST+ompK36_ins+ompK35, data=porine_data2_significant)  # 2-Way Frequency Table 
+
+mosaicplot(mytableinsert3, shade = TRUE, las=2, cex.axis = 1.5, type="pearson")
+summary(mytableinsert3)   # chi-square test of independence
+
+```
+
+**Supplemental figure S9 - Mosaic plots of ompK35 and the Insertion + presence/absence of ompK36 versus year**
+
+```{r, fig.height=7, fig.width=23}
+porine_data_date <- select(porines,-Id)
+porine_data_dateins <- data.frame(porine_data_date[,1:5], ompK36_ins=paste(porine_data_date[,3],porine_data_date[,2],sep="-"))
+
+## OmpK36_ins by year
+date_ompK36 <- xtabs(~Year+ompK36_ins, data=porine_data_dateins)
+mosaicplot(date_ompK36, shade = TRUE, cex.axis = 1, las=2)
+summary(date_ompK36)
+
+## OmpK35 by year
+date_ompK35 <- xtabs(~Year+ompK35, data=porine_data_dateins)
+mosaicplot(date_ompK35, shade = TRUE, cex.axis = 1, las=2)
+summary(date_ompK35)
+
+
+```
+
+**Supplemental figure S10 - Mosaic plots of ompK35 and the Insertion + presence/absence of ompK36 versus country of origin**
+
+```{r, fig.height=7, fig.width=23}
+porine_data_country <- select(porines,-Id)
+porine_data_countryins <- data.frame(porine_data_country[,1:5], ompK36_ins=paste(porine_data_country[,3],porine_data_country[,2],sep="-"), porine_data_country[,7:10])
+
+## OmpK36_ins by country
+country_ompK36 <- xtabs(~Country+ompK36_ins, data=porine_data_countryins)
+mosaicplot(country_ompK36, shade = TRUE, cex.axis = 1, las=2)
+summary(country_ompK36)
+
+## OmpK35 by country
+country_ompK35 <- xtabs(~Country+ompK35, data=porine_data_countryins)
+mosaicplot(country_ompK35, shade = TRUE, cex.axis = 1, las=2)
+summary(country_ompK35)
+
+
+```
+
+**Mosaic plots of ompK35 and the Insertion + presence/absence of ompK36 versus source (cleaned up)**
+
+```{r, fig.height=7, fig.width=23}
+porine_data_source <- select(porines,-Id)
+porine_data_sourceins <- data.frame(porine_data_country[,1:5], ompK36_ins=paste(porine_data_country[,3],porine_data_country[,2],sep="-"), porine_data_country[,7:10])
+
+## OmpK36_ins by Source
+#source_ompK36 <- xtabs(~Source_summarised+ompK36_ins, data=porine_data_sourceins)
+source_ompK36 <- xtabs(~Source_edited+ompK36_ins, data=porine_data_sourceins)
+mosaicplot(source_ompK36, shade = TRUE, cex.axis = 1, las=2)
+summary(source_ompK36)
+
+## OmpK35 by Source
+source_ompK35 <- xtabs(~Source_edited+ompK35, data=porine_data_sourceins)
+mosaicplot(source_ompK35, shade = TRUE, cex.axis = 1, las=2)
+summary(source_ompK35)
+
+
+```
+
+**Mosaic plots of ompK35 and the Insertion + presence/absence of ompK36 versus source (combined in 6 major categories)**
+
+```{r, fig.height=6, fig.width=10}
+porine_data_source <- select(porines,-Id)
+porine_data_sourceins <- data.frame(porine_data_country[,1:5], ompK36_ins=paste(porine_data_country[,3],porine_data_country[,2],sep="-"), porine_data_country[,7:10])
+
+## OmpK36_ins by Source
+source_ompK36 <- xtabs(~Source_summarised+ompK36_ins, data=porine_data_sourceins)
+mosaicplot(source_ompK36, shade = TRUE, cex.axis = 1, las=2)
+summary(source_ompK36)
+
+## OmpK35 by Source
+source_ompK35 <- xtabs(~Source_summarised+ompK35, data=porine_data_sourceins)
+mosaicplot(source_ompK35, shade = TRUE, cex.axis = 1, las=2)
+summary(source_ompK35)
+
+```
+
+**Mosaic plot of ompK35, the Insertion + presence/absence of ompK36 versus source (combined in 6 major categories)**
+
+```{r, fig.height=6, fig.width=10}
+
+source_ompK3536 <- xtabs(~Source_summarised+ompK36_ins+ompK35, data=porine_data_sourceins)
+mosaicplot(source_ompK3536, shade = TRUE, las=2)
+#summary(source_ompK3536)
+```

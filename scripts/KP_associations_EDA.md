@@ -26,7 +26,7 @@
 
     ### Loading data
 
-    #setwd("~//R_repository_data/scripts")
+    #setwd("~/REPOS/Klebsiella_antibiotics_paper/scripts")
     bap <- read.csv2("KP_screening_data.csv", header = TRUE, sep = ",", na.strings = "", stringsAsFactors = FALSE)
 
     ### Summary
@@ -99,8 +99,8 @@ outlines.
     #expected36 <- mosaic(~ST+ompK36, data=porine_data, type = "expected")
     #expected36
 
-**Supplemental figure S8 - Mosaic plot of the ompK35/ompK36
-presence/absence versus ST (3-way contigency table)**
+**Mosaic plot of the ompK35/ompK36 presence/absence versus ST (3-way
+contigency table)**
 
     # 3-way contingency table
     mytableompK3536 <- xtabs(~ST+ompK35+ompK36, data=porines)
@@ -153,8 +153,8 @@ and ompK35**
     ##  Chisq = 1989.3, df = 1592, p-value = 3.07e-11
     ##  Chi-squared approximation may be incorrect
 
-**Mosaic plot of the Insertion + presence/absence of ompK36 versus ST
-and ompK35 (significant only)**
+**Supplemental figure S8 - Mosaic plot of the Insertion +
+presence/absence of ompK36 versus ST and ompK35 (significant only)**
 
     # filter significantly different STs based on previous plot
     significant <- c('-', '101', '11', '14', '147', '278', '280', '15', '16', '17', '120', '200', '231', '258', '127', '273', '277', '29', '278', '3', '336', '37', '392', '442', '512', '873')
@@ -175,7 +175,7 @@ and ompK35 (significant only)**
     ##  Chi-squared approximation may be incorrect
 
 **Supplemental figure S9 - Mosaic plots of ompK35 and the Insertion +
-presence/absence of ompK36 versus year **
+presence/absence of ompK36 versus year**
 
     porine_data_date <- select(porines,-Id)
     porine_data_dateins <- data.frame(porine_data_date[,1:5], ompK36_ins=paste(porine_data_date[,3],porine_data_date[,2],sep="-"))
@@ -211,7 +211,7 @@ presence/absence of ompK36 versus year **
     ##  Chi-squared approximation may be incorrect
 
 **Supplemental figure S10 - Mosaic plots of ompK35 and the Insertion +
-presence/absence of ompK36 versus country of origin **
+presence/absence of ompK36 versus country of origin**
 
     porine_data_country <- select(porines,-Id)
     porine_data_countryins <- data.frame(porine_data_country[,1:5], ompK36_ins=paste(porine_data_country[,3],porine_data_country[,2],sep="-"), porine_data_country[,7:10])
@@ -247,7 +247,7 @@ presence/absence of ompK36 versus country of origin **
     ##  Chi-squared approximation may be incorrect
 
 **Mosaic plots of ompK35 and the Insertion + presence/absence of ompK36
-versus source (cleaned up) **
+versus source (cleaned up)**
 
     porine_data_source <- select(porines,-Id)
     porine_data_sourceins <- data.frame(porine_data_country[,1:5], ompK36_ins=paste(porine_data_country[,3],porine_data_country[,2],sep="-"), porine_data_country[,7:10])
@@ -284,7 +284,7 @@ versus source (cleaned up) **
     ##  Chi-squared approximation may be incorrect
 
 **Mosaic plots of ompK35 and the Insertion + presence/absence of ompK36
-versus source (combined in 6 major categories) **
+versus source (combined in 6 major categories)**
 
     porine_data_source <- select(porines,-Id)
     porine_data_sourceins <- data.frame(porine_data_country[,1:5], ompK36_ins=paste(porine_data_country[,3],porine_data_country[,2],sep="-"), porine_data_country[,7:10])
@@ -319,7 +319,7 @@ versus source (combined in 6 major categories) **
     ##  Chisq = 69.86, df = 5, p-value = 1.095e-13
 
 **Mosaic plot of ompK35, the Insertion + presence/absence of ompK36
-versus source (combined in 6 major categories) **
+versus source (combined in 6 major categories)**
 
     source_ompK3536 <- xtabs(~Source_summarised+ompK36_ins+ompK35, data=porine_data_sourceins)
     mosaicplot(source_ompK3536, shade = TRUE, las=2)
